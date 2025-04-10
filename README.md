@@ -1,6 +1,6 @@
 # AdolFO_VIP Noticia
 
-Portal de noticias moderno para República Dominicana y Latinoamérica, impulsado por inteligencia artificial.
+Portal de noticias dominicanas con análisis de IA en tiempo real
 
 ## Características
 
@@ -9,6 +9,7 @@ Portal de noticias moderno para República Dominicana y Latinoamérica, impulsad
 - Funcionalidad de texto a voz
 - Panel de administración protegido
 - Actualizaciones automáticas de contenido
+- Análisis de IA en tiempo real
 
 ## Tecnologías Utilizadas
 
@@ -16,6 +17,8 @@ Portal de noticias moderno para República Dominicana y Latinoamérica, impulsad
 - CSS3 con Tailwind CSS
 - JavaScript (ES6+)
 - Web Speech API para texto a voz
+- Soporte para modo oscuro
+- Optimizado para SEO
 
 ## Instalación
 
@@ -31,6 +34,22 @@ Para contribuir al desarrollo:
 3. Haz commit de tus cambios (`git commit -m 'Añadir nueva característica'`)
 4. Haz push a la rama (`git push origin feature/nueva-caracteristica`)
 5. Abre un Pull Request
+
+## Configuración de Netlify
+
+```
+[build]
+  command = "npm install -g pnpm && pnpm install && pnpm build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--no-optional"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+```
 
 ## Licencia
 
