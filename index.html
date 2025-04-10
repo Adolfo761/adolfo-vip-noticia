@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portal de noticias actualizadas de República Dominicana y Latinoamérica con análisis de IA en tiempo real">
+    <meta name="keywords" content="noticias, República Dominicana, Latinoamérica, IA, inteligencia artificial, noticias en vivo">
+    <meta name="author" content="AdolFO_VIP">
+    <meta property="og:title" content="AdolFO_VIP Noticia">
+    <meta property="og:description" content="Portal de noticias actualizadas de República Dominicana y Latinoamérica con análisis de IA en tiempo real">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://adolfo-vip-noticia.netlify.app/">
+    <meta name="theme-color" content="#1E40AF">
+    <title>AdolFO_VIP Noticia | Noticias de República Dominicana y Latinoamérica</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@700;900&display=swap');
+        
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary-color: #1e40af;
+            --text-color: #333;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            line-height: 1.3;
+        }
+        
+        .news-card {
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            background-color: var(--card-bg);
+            box-shadow: var(--card-shadow);
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-hover-shadow);
+        }
+        
+        .expanded-news {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .expanded-news.active {
+            max-height: 2000px;
+        }
+        
+        .category-tab {
+            position: relative;
+            cursor: pointer;
+            transition: color var(--transition-speed) ease;
+        }
+        
+        .category-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width var(--transition-speed) ease;
+        }
+        
+        .category-tab.active::after,
+        .category-tab:hover::after {
+            width: 100%;
+        }
+        
+        #ownerLoginModal {
+            transition: opacity var(--transition-speed) ease, visibility var(--transition-speed) ease;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .news-update-animation {
+            animation: newsUpdate 0.8s ease;
+        }
+        
+        @keyframes newsUpdate {
+            0% {
+                background-color: rgba(59, 130, 246, 0.2);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+        
+        .loader {
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mejoras de accesibilidad */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        /* Soporte para modo oscuro */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-color: #e5e7eb;
+                --bg-color: #1f2937;
+                --card-bg: #374151;
+                --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+                --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        /* Estilos para optimizar la exportación a PDF */
+        @media print {
+            .page-break {
+                page-break-before: always;
+            }
+            
+            .no-print {
+                display: none;
+            }
+            
+            body {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                background-color: white;
+                color: black;
+            }
+            
+            .container {
+                width: 100%;
+                max-width: none;
+            }
+        }
+        
+        /* Mejoras para dispositivos móviles */
+        @media (max-width: 640px) {
+            .category-tabs-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none; /* Firefox */
+            }
+            
+            .category-tabs-container::-webkit-scrollbar {
+                display: none; /* Chrome, Safari, Edge */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Encabezado -->
+    <header class="bg-gradient-to-r from-blue-800 to-blue-600 dark:from-blue-900 dark:to-blue-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="mr-4" aria-hidden="true">
+                        <svg class="w-12 h-12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                            <path d="M14 17H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold">AdolFO_VIP Noticia</h1>
+                        <p class="text-sm text-blue-200 dark:text-blue-100">Noticias actualizadas de República Dominicana y Latinoamérica</p>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="flex items-center bg-blue-700 dark:bg-blue-800 rounded-full px-4 py-2">
+                        <time id="currentDateTime" class="text-sm mr-2" datetime=""></time>
+                        <div class="bg-red-600 animate-pulse h-2 w-2 rounded-full mr-1" aria-hidden="true"></div>
+                        <span class="text-xs font-medium">EN VIVO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegación de categorías -->
+    <nav class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-10">
+        <div class="container mx-auto px-4">
+            <div class="flex overflow-x-auto py-3 category-tabs-container" id="categoryTabs" role="tablist" aria-label="Categorías de noticias">
+                <button class="category-tab active px-4 py-2 whitespace-nowrap font-medium text-blue-600 dark:text-blue-400" data-category="todas" role="tab" aria-selected="true" aria-controls="todas-panel">Todas</button>
+                <button class="category-tab px-4 py-2 whitespace-nowrap font-medium text-gray-600 dark:text-gray-300" data-category="local" role="tab" aria-selected="false" aria-controls="local-panel">Local (RD)</button>
+                <button class="category-tab px-4 py-2 whitespace-nowrap font-medium text-gray-600 dark:text-gray-300" data-category="deporte" role="tab" aria-selected="false" aria-controls="deporte-panel">Deporte</button>
+                <button class="category-tab px-4 py-2 whitespace-nowrap font-medium text-gray-600 dark:text-gray-300" data-category="internacional" role="tab" aria-selected="false" aria-controls="internacional-panel">Internacional</button>
+                <button class="category-tab px-4 py-2 whitespace-nowrap font-medium text-gray-600 dark:text-gray-300" data-category="tecnologia" role="tab" aria-selected="false" aria-controls="tecnologia-panel">Tecnología</button>
+                <button class="category-tab px-4 py-2 whitespace-nowrap font-medium text-gray-600 dark:text-gray-300" data-category="economia" role="tab" aria-selected="false" aria-controls="economia-panel">Economía</button>
+                <button class="category-tab px-4 py-2 whitespace-nowrap font-medium text-gray-600 dark:text-gray-300" data-category="entretenimiento" role="tab" aria-selected="false" aria-controls="entretenimiento-panel">Entretenimiento</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor Principal -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Banner de actualización IA -->
+        <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-8 flex flex-col sm:flex-row items-center justify-between">
+            <div class="flex items-center mb-3 sm:mb-0">
+                <div class="bg-blue-100 dark:bg-blue-800 p-2 rounded-lg mr-4" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium text-blue-800 dark:text-blue-200">Impulsado por Inteligencia Artificial</h3>
+                    <p class="text-sm text-blue-600 dark:text-blue-300">Nuestro sistema recopila y analiza noticias automáticamente para ofrecerte la información más relevante.</p>
+                </div>
+            </div>
+            <div id="lastUpdated" class="text-sm text-gray-500 dark:text-gray-400">
+                Última actualización: hace 5 minutos
+            </div>
+        </div>
+
+        <!-- Noticia destacada -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
+            <div class="md:flex">
+                <div class="md:flex-shrink-0 md:w-1/2">
+                    <div class="h-64 bg-gradient-to-r from-blue-500 to-purple-500 dark:from-blue-600 dark:to-purple-600 flex items-center justify-center">
+                        <span class="text-white text-lg font-bold">Imagen Destacada</span>
+                    </div>
+                </div>
+                <div class="p-6 md:w-1/2">
+                    <div class="flex items-center">
+                        <span class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs font-medium px-2.5 py-0.5 rounded">ÚLTIMA HORA</span>
+                        <time class="ml-2 text-xs text-gray-500 dark:text-gray-400" datetime="2025-04-10T13:30:00">hace 30 minutos</time>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-2 mb-3 dark:text-white">República Dominicana refuerza medidas para impulsar el turismo sostenible en 2025</h2>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">El Ministerio de Turismo de República Dominicana ha anunciado un ambicioso plan para consolidar al país como líder en turismo sostenible en el Caribe, con inversiones millonarias en infraestructura y capacitación.</p>
+                    <div class="flex items-center justify-between">
+                        <button class="read-more-btn inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" data-id="featured" aria-expanded="false" aria-controls="expanded-featured">
+                            <span>Ampliar más</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <button class="tts-btn inline-flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" data-id="featured" aria-label="Escuchar noticia">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                            <span>Escuchar</span>
+                        </button>
+                    </div>
+                    <div class="expanded-news mt-4 border-t border-gray-200 dark:border-gray-700 pt-4" id="expanded-featured">
+                        <p class="text-gray-700 dark:text-gray-300 mb-3">El proyecto, que comenzará a implementarse a partir del primer trimestre de 2025, incluye la renovación de instalaciones turísticas con tecnologías de bajo impacto ambiental, la creación de nuevas rutas ecoturísticas y programas de certificación para hoteles y operadores turísticos.</p>
+                        <p class="text-gray-700 dark:text-gray-300 mb-3">"Queremos que el turista que visite nuestro país pueda disfrutar de nuestras bellezas naturales con la garantía de que estamos protegiendo estos recursos para las futuras generaciones", declaró el ministro de Turismo durante la presentación del plan.</p>
+                        <p class="text-gray-700 dark:text-gray-300">Se espera que estas medidas generen más de 5,000 empleos directos en el sector y atraigan a un nuevo segmento de viajeros interesados en destinos comprometidos con la sostenibilidad.</p>
+                        <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                            Fuente: Ministerio de Turismo de República Dominicana | <a href="#" class="text-blue-600 hover:underline dark:text-blue-400" rel="noopener">Ver fuente original</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor de noticias -->
+        <div id="newsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-live="polite">
+            <!-- Las noticias se cargarán aquí dinámicamente -->
+        </div>
+
+        <!-- Indicador de carga -->
+        <div id="loadingIndicator" class="flex justify-center my-8 hidden" aria-hidden="true">
+            <div class="loader h-8 w-8 border-4 border-blue-200 dark:border-blue-700 border-t-4 rounded-full" role="status"></div>
+            <span class="ml-3 text-gray-600 dark:text-gray-300 sr-only">Actualizando noticias...</span>
+            <span class="ml-3 text-gray-600 dark:text-gray-300" aria-live="polite">Actualizando noticias...</span>
+        </div>
+
+        <!-- Botón de cargar más -->
+        <div class="flex justify-center mt-8">
+            <button id="loadMoreBtn" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-medium py-2 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-opacity-50">
+                Cargar más noticias
+            </button>
+        </div>
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-gray-900 dark:bg-gray-950 text-white mt-12 py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">AdolFO_VIP Noticia</h3>
+                    <p class="text-gray-400 dark:text-gray-300 text-sm">Su portal de noticias de confianza para mantenerse informado sobre República Dominicana y Latinoamérica, impulsado por inteligencia artificial.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium mb-4">Categorías</h4>
+                    <ul class="space-y-2 text-gray-400 dark:text-gray-300">
+                        <li><a href="#" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500" data-category="local">Local (RD)</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500" data-category="deporte">Deporte</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500" data-category="internacional">Internacional</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500" data-category="tecnologia">Tecnología</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500" data-category="economia">Economía</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium mb-4">Enlaces</h4>
+                    <ul class="space-y-2 text-gray-400 dark:text-gray-300">
+                        <li><a href="#" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Sobre nosotros</a></li>
+                        <li><a href="#contactForm" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Contacto</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Política de privacidad</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Términos de uso</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium mb-4">Contacto</h4>
+                    <form id="contactForm" class="space-y-3" aria-label="Formulario de contacto">
+                        <div>
+                            <label for="nombre" class="sr-only">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Nombre" required class="w-full px-3 py-2 bg-gray-800 dark:bg-gray-700 border border-gray-700 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white text-sm">
+                        </div>
+                        <div>
+                            <label for="email" class="sr-only">Correo electrónico</label>
+                            <input type="email" id="email" name="email" placeholder="Correo electrónico" required class="w-full px-3 py-2 bg-gray-800 dark:bg-gray-700 border border-gray-700 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white text-sm">
+                        </div>
+                        <div>
+                            <label for="mensaje" class="sr-only">Mensaje</label>
+                            <textarea id="mensaje" name="mensaje" placeholder="Mensaje" rows="3" required class="w-full px-3 py-2 bg-gray-800 dark:bg-gray-700 border border-gray-700 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white text-sm"></textarea>
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Enviar mensaje</button>
+                    </form>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 dark:border-gray-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 dark:text-gray-300 text-sm">&copy; <span id="currentYear">2025</span> AdolFO_VIP Noticia. Todos los derechos reservados.</p>
+                <div class="mt-4 md:mt-0">
+                    <button id="ownerAccessBtn" class="text-gray-400 hover:text-blue-400 dark:text-gray-300 dark:hover:text-blue-300 text-sm transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Acceso Propietario</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de acceso del propietario -->
+    <div id="ownerLoginModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white" id="modalTitle">Acceso Propietario</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Cerrar">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="ownerLoginForm" class="space-y-4">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
+                    <input type="password" id="password" name="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div id="loginError" class="text-red-600 dark:text-red-400 text-sm hidden">Contraseña incorrecta. Inténtelo de nuevo.</div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800">
+                    Acceder
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Panel de administración (visible solo después del login exitoso) -->
+    <div id="adminPanel" class="fixed inset-0 bg-gray-100 dark:bg-gray-900 z-50 hidden overflow-auto">
+        <div class="container mx-auto px-4 py-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Panel de Administración - AdolFO_VIP Noticia</h2>
+                    <button id="logoutBtn" class="text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                        Cerrar sesión
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
+                        <h3 class="text-lg font-medium text-blue-800 dark:text-blue-200 mb-2">Estadísticas</h3>
+                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-300 mb-1">247</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Noticias indexadas hoy</p>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900 rounded-lg p-4 border border-green-100 dark:border-green-800">
+                        <h3 class="text-lg font-medium text-green-800 dark:text-green-200 mb-2">Usuarios</h3>
+                        <p class="text-3xl font-bold text-green-600 dark:text-green-300 mb-1">5,293</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Visitantes únicos hoy</p>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-purple-900 rounded-lg p-4 border border-purple-100 dark:border-purple-800">
+                        <h3 class="text-lg font-medium text-purple-800 dark:text-purple-200 mb-2">Rendimiento IA</h3>
+                        <p class="text-3xl font-bold text-purple-600 dark:text-purple-300 mb-1">98.2%</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Precisión en categorización</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-8">
+                    <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-4">Configuración del Sistema</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="updateInterval" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Intervalo de actualización de noticias</label>
+                            <select id="updateInterval" class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option>Cada 15 minutos</option>
+                                <option>Cada 30 minutos</option>
+                                <option selected>Cada hora</option>
+                                <option>Cada 3 horas</option>
+                                <option>Cada 6 horas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="aiModel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Modelo de IA para resúmenes</label>
+                            <select id="aiModel" class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option selected>BART-large-cnn</option>
+                                <option>T5-base</option>
+                                <option>Pegasus</option>
+                                <option>GPT-J-6B</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                    <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-4">Fuentes de Noticias</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                            <thead class="bg-gray-100 dark:bg-gray-800">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fuente</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Última actualización</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Listín Diario</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Activo</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">Hace 35 minutos</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Editar</button>
+                                        <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 ml-3 focus:outline-none focus:ring-2 focus:ring-red-500">Pausar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Diario Libre</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Activo</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">Hace 12 minutos</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Editar</button>
+                                        <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 ml-3 focus:outline-none focus:ring-2 focus:ring-red-500">Pausar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">El Nacional</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Activo</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">Hace 45 minutos</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Editar</button>
+                                        <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 ml-3 focus:outline-none focus:ring-2 focus:ring-red-500">Pausar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">CNN en Español</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Advertencia</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">Hace 2 horas</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Editar</button>
+                                        <button class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 ml-3 focus:outline-none focus:ring-2 focus:ring-red-500">Pausar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Datos simulados para noticias
+        const newsData = [
+            {
+                id: 1,
+                title: "El Banco Central de República Dominicana mantiene la tasa de política monetaria en 7.5%",
+                summary: "La decisión busca controlar la inflación mientras se fomenta el crecimiento económico en un contexto global desafiante.",
+                fullContent: "El Banco Central de la República Dominicana (BCRD) decidió mantener su tasa de política monetaria en 7.5% tras su reunión mensual de política monetaria. La entidad monetaria explicó que la decisión se basa en un análisis exhaustivo del balance de riesgos en torno a las proyecciones de inflación, las expectativas del mercado y el entorno macroeconómico internacional.\n\nSegún el comunicado oficial, la inflación interanual se situó en 3.8% en marzo, manteniéndose dentro del rango meta de 4.0% ± 1.0%. Las proyecciones indican que la inflación continuará convergiendo hacia el centro del rango objetivo en el horizonte de política.\n\nEl BCRD también destacó el buen desempeño de la economía dominicana, que registró un crecimiento de 4.2% interanual en el primer trimestre del año, impulsado principalmente por los sectores de turismo, construcción y zonas francas.",
+                category: "economia",
+                imageUrl: "",
+                source: "Banco Central de República Dominicana",
+                sourceUrl: "#",
+                timestamp: "3 horas atrás"
+            },
+            {
+                id: 2,
+                title: "Selección Dominicana de Baloncesto se prepara para las clasificatorias al Mundial 2026",
+                summary: "El equipo nacional ha iniciado un intenso programa de entrenamiento bajo la dirección del nuevo entrenador José 'Macho' Núñez.",
+                fullContent: "La Selección Dominicana de Baloncesto ha iniciado su preparación para las próximas ventanas clasificatorias al Mundial de Baloncesto FIBA 2026. Bajo la dirección del recientemente nombrado entrenador José 'Macho' Núñez, el equipo nacional enfrenta un calendario exigente con el objetivo de asegurar su presencia en la cita mundialista.\n\nEl programa de preparación incluye una serie de partidos amistosos contra selecciones de la región, comenzando la próxima semana con enfrentamientos ante Puerto Rico y Venezuela.\n\n'Tenemos un grupo talentoso y comprometido. Nuestro objetivo es claro: clasificar al Mundial y seguir posicionando a República Dominicana en la élite del baloncesto internacional', declaró Núñez durante la presentación del plan de trabajo.\n\nJugadores de la NBA como Karl-Anthony Towns y Al Horford han confirmado su disponibilidad para unirse al equipo en las fechas FIBA, lo que refuerza significativamente las aspiraciones dominicanas.",
+                category: "deporte",
+                imageUrl: "",
+                source: "FEDOMBAL",
+                sourceUrl: "#",
+                timestamp: "5 horas atrás"
+            },
+            {
+                id: 3,
+                title: "Nuevo sistema de alerta temprana para huracanes será implementado en República Dominicana",
+                summary: "La Oficina Nacional de Meteorología anuncia tecnología de vanguardia para mejorar la predicción y respuesta ante fenómenos atmosféricos.",
+                fullContent: "La Oficina Nacional de Meteorología (ONAMET) anunció la implementación de un moderno sistema de alerta temprana para huracanes y otros fenómenos atmosféricos que afectan a República Dominicana. El proyecto, desarrollado en colaboración con la Organización Meteorológica Mundial (OMM), representa una inversión de aproximadamente 8 millones de dólares.\n\nEl nuevo sistema integra tecnología satelital avanzada, radares meteorológicos de última generación y una red de estaciones automáticas distribuidas estratégicamente en todo el territorio nacional. Esto permitirá monitorear en tiempo real las condiciones atmosféricas y emitir alertas con mayor precisión y antelación.\n\n'Este sistema nos coloca a la vanguardia en la región en términos de predicción meteorológica. Podremos anticipar con mayor precisión la trayectoria e intensidad de los fenómenos atmosféricos, lo que se traduce en mayor tiempo para tomar medidas preventivas y, en consecuencia, salvar vidas', explicó Gloria Ceballos, directora de ONAMET.\n\nEl sistema estará completamente operativo antes del inicio de la temporada ciclónica de 2025, que comienza oficialmente el 1 de junio.",
+                category: "local",
+                imageUrl: "",
+                source: "ONAMET",
+                sourceUrl: "#",
+                timestamp: "7 horas atrás"
+            },
+            {
+                id: 4,
+                title: "Acuerdo histórico entre la Unión Europea y Mercosur tras 20 años de negociaciones",
+                summary: "El tratado de libre comercio entre ambos bloques promete impulsar el intercambio comercial y fortalecer las relaciones económicas.",
+                fullContent: "Después de más de dos décadas de negociaciones, la Unión Europea y el Mercosur (Argentina, Brasil, Paraguay y Uruguay) finalmente han alcanzado un acuerdo de libre comercio histórico. El tratado, que elimina aranceles para el 91% de los productos comercializados entre ambos bloques, fue firmado ayer en Bruselas tras superar los últimos obstáculos relacionados con protecciones ambientales y estándares agrícolas.\n\nEl acuerdo creará un mercado integrado de casi 780 millones de personas y representará uno de los mayores bloques comerciales del mundo. Para los países latinoamericanos, significa un acceso preferencial al mercado europeo, especialmente para productos agrícolas, mientras que las empresas europeas podrán aumentar sus exportaciones de productos manufacturados y servicios.\n\n'Este es un acuerdo histórico que demuestra el compromiso de ambas regiones con el multilateralismo y un sistema de comercio internacional basado en reglas en tiempos de crecientes tensiones comerciales', declaró la presidenta de la Comisión Europea, durante la ceremonia de firma.\n\nSe espera que el tratado entre en vigor a principios de 2026, una vez que sea ratificado por los parlamentos nacionales de todos los países involucrados.",
+                category: "internacional",
+                imageUrl: "",
+                source: "Comisión Europea",
+                sourceUrl: "#",
+                timestamp: "12 horas atrás"
+            },
+            {
+                id: 5,
+                title: "Científicos dominicanos desarrollan aplicación para monitoreo de arrecifes de coral",
+                summary: "La herramienta utiliza inteligencia artificial para evaluar el estado de salud de los ecosistemas marinos en tiempo real.",
+                fullContent: "Un equipo de científicos e ingenieros dominicanos del Instituto Tecnológico de Santo Domingo (INTEC) ha desarrollado una innovadora aplicación que utiliza inteligencia artificial para monitorear el estado de salud de los arrecifes de coral en el Caribe.\n\nDenominada 'CoralGuardian', la aplicación permite a científicos, guardaparques e incluso ciudadanos comunes contribuir a la vigilancia de estos ecosistemas marinos críticos. Los usuarios pueden tomar fotografías submarinas que son analizadas por algoritmos de IA para identificar especies de coral, detectar enfermedades, blanqueamiento y otros indicadores de estrés ambiental.\n\n'Los arrecifes de coral son ecosistemas vitales para la biodiversidad marina y la economía dominicana, pero están amenazados por el cambio climático y la actividad humana. Esta herramienta democratiza el monitoreo científico y nos permite obtener datos en tiempo real sobre su estado', explicó la Dra. Carmen Sánchez, líder del proyecto.\n\nLa iniciativa ha recibido financiamiento de la UNESCO y del Programa de las Naciones Unidas para el Medio Ambiente (PNUMA), y ya está siendo implementada en áreas marinas protegidas de República Dominicana, con planes para extenderla a otros países del Caribe en los próximos meses.",
+                category: "tecnologia",
+                imageUrl: "",
+                source: "INTEC",
+                sourceUrl: "#",
+                timestamp: "1 día atrás"
+            },
+            {
+                id: 6,
+                title: "Festival de Cine de Santo Domingo anuncia su programación para 2025",
+                summary: "El evento cinematográfico más importante del país celebrará su 15ª edición con una selección de películas nacionales e internacionales.",
+                fullContent: "El Festival de Cine de Santo Domingo (FCSD) ha anunciado la programación oficial para su 15ª edición, que se celebrará del 24 al 30 de mayo de 2025. El evento contará con la proyección de más de 70 películas, incluyendo largometrajes, documentales y cortometrajes de República Dominicana y más de 25 países.\n\nLa película inaugural será 'Tierra de Mangos', el nuevo drama del aclamado director dominicano José Rodríguez, que recientemente recibió reconocimiento en el Festival de San Sebastián. El filme narra la historia de tres generaciones de una familia en la región Este del país y su relación con la tierra y las tradiciones.\n\nEsta edición del festival pondrá especial énfasis en el cine caribeño contemporáneo, con una sección dedicada a nuevos talentos de la región. Además, contará con masterclasses de reconocidos cineastas internacionales y paneles sobre la industria cinematográfica.\n\n'Estamos muy entusiasmados con la calidad y diversidad de la programación de este año. El festival se ha consolidado como una plataforma esencial para la promoción del cine dominicano y como un punto de encuentro para la industria cinematográfica de la región', comentó María Álvarez, directora del FCSD.\n\nLas proyecciones tendrán lugar en diferentes salas de la capital dominicana, incluyendo algunas funciones gratuitas en espacios públicos para democratizar el acceso al cine de calidad.",
+                category: "entretenimiento",
+                imageUrl: "",
+                source: "Festival de Cine de Santo Domingo",
+                sourceUrl: "#",
+                timestamp: "1 día atrás"
+            }
+        ];
+
+        // Función para formatear la fecha y hora actuales
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('es-DO', options);
+        }
+
+        // Función para simular la actualización de noticias
+        function simulateNewsUpdate() {
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('loadingIndicator').classList.add('hidden');
+                document.getElementById('lastUpdated').textContent = 'Última actualización: hace 1 minuto';
+                
+                // Agregar una noticia nueva al principio con animación
+                const container = document.getElementById('newsContainer');
+                const firstCard = container.firstChild;
+                
+                if (firstCard) {
+                    firstCard.classList.add('news-update-animation');
+                    setTimeout(() => {
+                        firstCard.classList.remove('news-update-animation');
+                    }, 1000);
+                }
+            }, 2000);
+        }
+
+        // Inicializar las categorías
+        function initCategories() {
+            const tabs = document.querySelectorAll('.category-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active', 'text-blue-600'));
+                    tabs.forEach(t => t.classList.add('text-gray-600'));
+                    this.classList.add('active', 'text-blue-600');
+                    this.classList.remove('text-gray-600');
+                    
+                    const category = this.dataset.category;
+                    filterNewsByCategory(category);
+                });
+            });
+        }
+
+        // Filtrar noticias por categoría
+        function filterNewsByCategory(category) {
+            const newsCards = document.querySelectorAll('.news-card');
+            
+            if (category === 'todas') {
+                newsCards.forEach(card => {
+                    card.classList.remove('hidden');
+                    card.classList.add('slide-in');
+                });
+                return;
+            }
+            
+            newsCards.forEach(card => {
+                if (card.dataset.category === category) {
+                    card.classList.remove('hidden');
+                    card.classList.add('slide-in');
+                } else {
+                    card.classList.add('hidden');
+                    card.classList.remove('slide-in');
+                }
+            });
+        }
+
+        // Generar tarjetas de noticias
+        function generateNewsCards() {
+            const container = document.getElementById('newsContainer');
+            
+            newsData.forEach(news => {
+                const card = document.createElement('div');
+                card.className = 'news-card bg-white rounded-lg shadow-md overflow-hidden slide-in';
+                card.dataset.category = news.category;
+                card.innerHTML = `
+                    <div class="h-40 bg-gray-200 flex items-center justify-center">
+                        <span class="text-gray-500">Imagen de la noticia</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center mb-2">
+                            <span class="text-xs font-medium px-2 py-0.5 rounded ${getCategoryBadgeClass(news.category)}">${getCategoryName(news.category)}</span>
+                            <span class="ml-2 text-xs text-gray-500">${news.timestamp}</span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">${news.title}</h3>
+                        <p class="text-gray-600 text-sm mb-3">${news.summary}</p>
+                        <div class="flex items-center justify-between">
+                            <button class="read-more-btn inline-flex items-center text-blue-600 hover:text-blue-800 text-sm" data-id="${news.id}">
+                                Ampliar más
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <button class="tts-btn inline-flex items-center text-gray-600 hover:text-blue-600 text-sm" data-id="${news.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                </svg>
+                                Escuchar
+                            </button>
+                        </div>
+                        <div class="expanded-news mt-4 border-t pt-4" id="expanded-${news.id}">
+                            <p class="text-gray-700 text-sm whitespace-pre-line">${news.fullContent}</p>
+                            <div class="mt-4 text-xs text-gray-500">
+                                Fuente: ${news.source} | <a href="${news.sourceUrl}" class="text-blue-600 hover:underline">Ver fuente original</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // Añadir listeners a los botones de "Ampliar más"
+            document.querySelectorAll('.read-more-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const expandedNews = document.getElementById(`expanded-${id}`);
+                    expandedNews.classList.toggle('active');
+                    
+                    // Cambiar el texto del botón
+                    if (expandedNews.classList.contains('active')) {
+                        this.innerHTML = `
+                            Mostrar menos
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                            </svg>
+                        `;
+                    } else {
+                        this.innerHTML = `
+                            Ampliar más
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        `;
+                    }
+                });
+            });
+            
+            // Añadir listeners a los botones de TTS
+            document.querySelectorAll('.tts-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const news = newsData.find(n => n.id == id) || 
+                        (id === 'featured' ? {
+                            title: "República Dominicana refuerza medidas para impulsar el turismo sostenible en 2025",
+                            fullContent: "El Ministerio de Turismo de República Dominicana ha anunciado un ambicioso plan para consolidar al país como líder en turismo sostenible en el Caribe, con inversiones millonarias en infraestructura y capacitación. El proyecto, que comenzará a implementarse a partir del primer trimestre de 2025, incluye la renovación de instalaciones turísticas con tecnologías de bajo impacto ambiental, la creación de nuevas rutas ecoturísticas y programas de certificación para hoteles y operadores turísticos. 'Queremos que el turista que visite nuestro país pueda disfrutar de nuestras bellezas naturales con la garantía de que estamos protegiendo estos recursos para las futuras generaciones', declaró el ministro de Turismo durante la presentación del plan. Se espera que estas medidas generen más de 5,000 empleos directos en el sector y atraigan a un nuevo segmento de viajeros interesados en destinos comprometidos con la sostenibilidad."
+                        } : null);
+                    
+                    if (news) {
+                        speakText(`${news.title}. ${news.fullContent}`);
+                        this.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 animate-pulse text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                            Reproduciendo...
+                        `;
+                        
+                        setTimeout(() => {
+                            this.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                </svg>
+                                Escuchar
+                            `;
+                        }, 5000);
+                    }
+                });
+            });
+        }
+
+        // Función de texto a voz
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                // Cancelar cualquier síntesis de voz en progreso
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                
+                // Conseguir una voz en español si está disponible
+                const voices = window.speechSynthesis.getVoices();
+                const spanishVoice = voices.find(voice => voice.lang === 'es-ES' || voice.lang === 'es-MX');
+                if (spanishVoice) {
+                    utterance.voice = spanishVoice;
+                }
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log('La síntesis de voz no está soportada en este navegador.');
+            }
+        }
+
+        // Función para obtener clase de badge según categoría
+        function getCategoryBadgeClass(category) {
+            const classes = {
+                'local': 'bg-green-100 text-green-800',
+                'deporte': 'bg-blue-100 text-blue-800',
+                'internacional': 'bg-purple-100 text-purple-800',
+                'tecnologia': 'bg-indigo-100 text-indigo-800',
+                'economia': 'bg-yellow-100 text-yellow-800',
+                'entretenimiento': 'bg-pink-100 text-pink-800'
+            };
+            return classes[category] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Función para obtener nombre de categoría
+        function getCategoryName(category) {
+            const names = {
+                'local': 'Local',
+                'deporte': 'Deporte',
+                'internacional': 'Internacional',
+                'tecnologia': 'Tecnología',
+                'economia': 'Economía',
+                'entretenimiento': 'Entretenimiento'
+            };
+            return names[category] || category;
+        }
+
+        // Funcionalidad de acceso del propietario
+        function setupOwnerAccess() {
+            const ownerAccessBtn = document.getElementById('ownerAccessBtn');
+            const ownerLoginModal = document.getElementById('ownerLoginModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const ownerLoginForm = document.getElementById('ownerLoginForm');
+            const adminPanel = document.getElementById('adminPanel');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            ownerAccessBtn.addEventListener('click', function() {
+                ownerLoginModal.classList.remove('hidden');
+            });
+            
+            closeModalBtn.addEventListener('click', function() {
+                ownerLoginModal.classList.add('hidden');
+            });
+            
+            ownerLoginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('password').value;
+                
+                if (password === '@dolfo7618024') {
+                    // Login exitoso
+                    ownerLoginModal.classList.add('hidden');
+                    adminPanel.classList.remove('hidden');
+                } else {
+                    // Login fallido
+                    document.getElementById('loginError').classList.remove('hidden');
+                }
+            });
+            
+            logoutBtn.addEventListener('click', function() {
+                adminPanel.classList.add('hidden');
+                document.getElementById('password').value = '';
+                document.getElementById('loginError').classList.add('hidden');
+            });
+        }
+
+        // Inicializar el sitio web
+        function initWebsite() {
+            updateDateTime();
+            setInterval(updateDateTime, 60000); // Actualizar cada minuto
+            
+            generateNewsCards();
+            initCategories();
+            setupOwnerAccess();
+            
+            // Simular actualización de noticias cada 30 segundos
+            setInterval(simulateNewsUpdate, 30000);
+            
+            // Configurar el formulario de contacto
+            document.getElementById('contactForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Tu mensaje ha sido enviado a acostaadolfo761@gmail.com');
+                this.reset();
+            });
+            
+            // Configurar botón de cargar más
+            document.getElementById('loadMoreBtn').addEventListener('click', function() {
+                this.innerHTML = '<span class="loader h-4 w-4 border-2 border-white border-t-2 rounded-full mr-2"></span> Cargando...';
+                
+                setTimeout(() => {
+                    // Simular carga de más noticias
+                    this.innerHTML = 'Cargar más noticias';
+                    alert('¡Funcionalidad en desarrollo! En la versión completa, aquí se cargarían más noticias de la base de datos.');
+                }, 1500);
+            });
+        }
+
+        // Iniciar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initWebsite);
+    </script>
+</body>
+</html>
